@@ -4,6 +4,7 @@ from accounts import models as accounts_models
 class ClassGroup(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(null=True)
+    color = models.CharField(max_length=10)
     user = models.ForeignKey(accounts_models.User, related_name='classes', on_delete=models.CASCADE)
 
     class Meta:
@@ -17,6 +18,7 @@ class Quiz(models.Model):
     due_date = models.DateField(null=True)
     question_order = models.CharField(max_length=25, default='order')
     default_mark = models.FloatField(default=1)
+    color = models.CharField(max_length=10)
 
     def __str__(self):
         return self.name
@@ -24,7 +26,6 @@ class Quiz(models.Model):
     class Meta:
         unique_together = ['title', 'class_group']
         verbose_name_plural = "quizzes"
-
 
 class Question(models.Model):
     title = models.TextField(null=True)
@@ -41,7 +42,6 @@ class Question(models.Model):
     def __str__(self):
         return self.title
 
-
 class Answer(models.Model):
     title = models.CharField(max_length=255)
     question = models.ForeignKey(Question, related_name='answers', on_delete=models.CASCADE)
@@ -55,7 +55,7 @@ class Answer(models.Model):
 
 class Result(models.Model):
     quiz = models.ForeignKey(Quiz, related_name='quiz_results', on_delete=models.CASCADE)
-    question = models.ForeignKey(Question, related_name='question_results', on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, related_name='results', on_delete=models.CASCADE)
     student = models.ForeignKey(accounts_models.User, related_name='user_results', on_delete=models.CASCADE)
     correct = models.NullBooleanField()
     do_not_know = models.NullBooleanField()
@@ -70,8 +70,3 @@ class StudentClassGroup(models.Model):
 
     class Meta:
         unique_together = ['student', 'class_group']
-
-class File(models.Model):
-    question = models.ForeignKey(Question, related_name='files', on_delete=models.CASCADE)
-    datafile = models.FileField()
-    uploaded_at = models.DateTimeField(auto_now_add=True)

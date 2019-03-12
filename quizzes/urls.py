@@ -57,7 +57,7 @@ urlpatterns = [
         name='answer_detail'),
 
     path('quizzes/<int:quiz_pk>/assessment/',
-        views.ListQuestionWithAnswers.as_view(),
+        views.ListQuestionsAnswersResults.as_view(),
         name='assessment'),
 
     path('quizzes/<int:quiz_pk>/results/',
@@ -88,9 +88,6 @@ urlpatterns = [
         views.DoNotKnowResult.as_view(),
         name="result_donotknow"),
 
-    path('files/questions/<int:question_pk>/',
-        views.ListCreateFile.as_view(),
-        name="file_list"),
-
     path('static/<path>', serve, {'document_root': settings.MEDIA_ROOT,}),
+
 ]

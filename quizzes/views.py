@@ -130,7 +130,7 @@ class ListCreateQuestion(generics.ListCreateAPIView):
 
 class RetrieveUpdateDestroyQuestion(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Question.objects.all()
-    serializer_class = serializers.QuestionAndAnswersSerializer
+    serializer_class = serializers.QuestionsAnswersSerializer
 
     def get_object(self):
         return get_object_or_404(
@@ -186,9 +186,9 @@ class RetrieveUpdateDestroyAnswer(generics.RetrieveUpdateDestroyAPIView):
         serializer.save()
 
 # Assessment View
-class ListQuestionWithAnswers(generics.ListAPIView):
+class ListQuestionsAnswersResults(generics.ListAPIView):
     queryset = models.Question.objects.all()
-    serializer_class = serializers.QuestionAnswersSerializer
+    serializer_class = serializers.QuestionsAnswersResultsSerializer
     pagination_class = SmallResultsSetPagination
 
     def get_queryset(self):
@@ -196,6 +196,7 @@ class ListQuestionWithAnswers(generics.ListAPIView):
         return self.queryset.filter(
                 quiz_id=self.kwargs.get('quiz_pk')
             ).order_by(quiz_question_order['question_order'])
+
 
 class DoNotKnowResult(generics.CreateAPIView):
     serializer_class = serializers.DoNotKnowSerializer
@@ -309,15 +310,3 @@ class ListAssessmentResult(APIView):
             'result': result,
             'quiz': quiz
         })
-
-# class DestroyResult(generics.DestroyAPIView):
-#     queryset = models.Result.objects.all()
-#     serializer_class = serializers.ResultSerializer
-
-class ListCreateFile(generics.ListCreateAPIView):
-    queryset = models.File.objects.all()
-    serializer_class = serializers.FileSerializer
-    parser_classes = (MultiPartParser, FormParser,)
-
-    def get_queryset(self):
-        return self.queryset.filter(question_id=self.kwargs.get('question_pk'))

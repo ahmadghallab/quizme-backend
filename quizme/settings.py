@@ -27,7 +27,11 @@ SECRET_KEY = '!x8kk1nbldd#wtabsr@rnbejkmx_*qy5l7g&=mtw8f9l2pe1(*'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost:8080', '192.168.1.3:8080', 'quizme-backend.herokuapp.com']
+ALLOWED_HOSTS = [
+    'localhost:8080',
+    '192.168.1.3:8080',
+    'quizme-backend.herokuapp.com',
+    '127.0.0.1']
 
 # Application definition
 

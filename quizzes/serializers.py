@@ -9,32 +9,38 @@ class AnswerSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'question', 'correct')
         model = models.Answer
 
-class FileSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = ('uploaded_at', 'question', 'datafile')
-        model = models.File
-
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'title', 'quiz', 'order', 'type', 'mark', 'mark_divided', 'file')
         model = models.Question
 
-class QuestionAndAnswersSerializer(serializers.ModelSerializer):
+class QuestionsAnswersSerializer(serializers.ModelSerializer):
     answers = AnswerSerializer(many=True, read_only=True)
 
     class Meta:
         fields = ('id', 'title', 'quiz', 'order', 'type', 'mark', 'mark_divided', 'answers', 'file')
         model = models.Question
 
+class ClassGroupSerializer(serializers.ModelSerializer):
+    total_quizzes = serializers.SerializerMethodField()
+
+    class Meta:
+        fields = ('id', 'title', 'description', 'color', 'user', 'total_quizzes')
+        model = models.ClassGroup
+
+    def get_total_quizzes(self, obj):
+        total = obj.quizzes.aggregate(Count('id')).get('id__count')
+        if total is None:
+            return 0
+        return total
+
 class QuizSerializer(serializers.ModelSerializer):
-    questions = QuestionSerializer(many=True, read_only=True)
     total_questions = serializers.SerializerMethodField()
 
     class Meta:
         fields = (
-            'id', 'title', 'created_at',
-            'questions', 'total_questions',
-            'class_group', 'due_date', 'default_mark', 'question_order'
+            'id', 'title', 'created_at', 'total_questions',
+            'class_group', 'due_date', 'default_mark', 'question_order', 'color'
         )
         model = models.Quiz
 
@@ -59,7 +65,6 @@ class DoNotKnowSerializer(serializers.ModelSerializer):
         fields = ('id','quiz','question','student','do_not_know')
         model = models.Result
 
-
 class FilteredResultSerializer(serializers.ListSerializer):
     def to_representation(self, data):
         data = data.filter(student=self.context['request'].query_params.get('student'))
@@ -71,26 +76,13 @@ class QuestionResultSerializer(serializers.ModelSerializer):
         fields = ('answer', 'correct', 'answer_text', 'do_not_know')
         model = models.Result
 
-class QuestionAnswersSerializer(serializers.ModelSerializer):
+class QuestionsAnswersResultsSerializer(serializers.ModelSerializer):
     answers = AnswerSerializer(many=True, read_only=True)
-    question_results = QuestionResultSerializer(many=True, read_only=True)
+    results = QuestionResultSerializer(many=True, read_only=True)
 
     class Meta:
-        fields = ('id', 'title', 'quiz', 'order', 'type', 'mark', 'file', 'answers', 'question_results')
+        fields = ('id', 'title', 'type', 'mark', 'file', 'answers', 'results')
         model = models.Question
-
-class ClassGroupSerializer(serializers.ModelSerializer):
-    total_quizzes = serializers.SerializerMethodField()
-
-    class Meta:
-        fields = ('id', 'title', 'description', 'user', 'total_quizzes')
-        model = models.ClassGroup
-
-    def get_total_quizzes(self, obj):
-        total = obj.quizzes.aggregate(Count('id')).get('id__count')
-        if total is None:
-            return 0
-        return total
 
 
 class StudentClassGroupSerializer(serializers.ModelSerializer):
